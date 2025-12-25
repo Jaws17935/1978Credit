@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>信用卡計算機</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        .input-section {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .results-section {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        /* 移除數字輸入框的箭頭 */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-table tr {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .results-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .results-table td {
+            padding: 12px 15px;
+            font-size: 14px;
+        }
+
+        .results-table td:first-child {
+            color: #666;
+            font-weight: 600;
+            width: 40%;
+            background: #f8f9fa;
+        }
+
+        .results-table td:last-child {
+            color: #333;
+            font-weight: 700;
+            text-align: right;
+            font-size: 16px;
+        }
+
+        .results-table tr.highlight td:last-child {
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .results-table .info-text {
+            color: #888;
+            font-size: 11px;
+            font-weight: normal;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .currency-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .currency-toggle label {
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+
+        .toggle-buttons {
+            display: flex;
+            gap: 5px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            padding: 3px;
+        }
+
+        .toggle-btn {
+            padding: 6px 15px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: #666;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .toggle-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .toggle-btn.active:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💳 信用卡計算機</h1>
+        
+        <div class="content-wrapper">
+            <div class="input-section">
+                <div class="input-group">
+                    <div class="currency-toggle">
+                        <label for="totalInput">總金額</label>
+                        <div class="toggle-buttons">
+                            <button class="toggle-btn active" id="toggleRMB" onclick="switchCurrency('RMB')">RMB</button>
+                            <button class="toggle-btn" id="toggleTWD" onclick="switchCurrency('TWD')">TWD</button>
+                        </div>
+                    </div>
+                    <input type="number" id="totalInput" placeholder="輸入總金額" step="0.01" min="0">
+                </div>
+
+                <div class="input-group">
+                    <label for="twd">台幣扣款金額 (TWD)</label>
+                    <input type="number" id="twd" placeholder="輸入台幣扣款金額" step="0.01" min="0">
+                </div>
+
+                <div class="input-group">
+                    <label for="fee">手續費 (TWD)</label>
+                    <input type="number" id="fee" placeholder="輸入手續費" step="0.01" min="0">
+                </div>
+            </div>
+
+            <div class="results-section">
+                <div class="results" id="results">
+                    <table class="results-table">
+                <tr>
+                    <td>未含手續費匯率</td>
+                    <td>
+                        <span id="rateWithoutFee">-</span>
+                        <span class="info-text">1 人民幣 = <span id="rateWithoutFeeText">-</span> 台幣</span>
+                    </td>
+                </tr>
+                <tr class="highlight">
+                    <td>實含手續費匯率</td>
+                    <td>
+                        <span id="rateWithFee">-</span>
+                        <span class="info-text">1 人民幣 = <span id="rateWithFeeText">-</span> 台幣（實際成本）</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>實際含手續費總金額</td>
+                    <td>
+                        <span id="totalPaymentAmount">-</span>
+                        <span class="info-text">台幣扣款 + 手續費</span>
+                    </td>
+                </tr>
+                <tr class="highlight" id="conversionItem" style="display: none;">
+                    <td id="conversionLabel">實際人民幣總金額</td>
+                    <td>
+                        <span id="conversionAmount">-</span>
+                        <span class="info-text" id="conversionInfo">-</span>
+                    </td>
+                </tr>
+                <tr class="highlight" id="totalCalculationItem" style="display: none;">
+                    <td>實際需刷卡次數</td>
+                    <td>
+                        <span id="cardCount">-</span>
+                        <span class="info-text">每次200人民幣，共需 <span id="cardCountText">-</span> 次</span>
+                    </td>
+                </tr>
+                <tr class="highlight" id="totalPaymentItem" style="display: none;">
+                    <td id="totalPaymentLabel">總支付金額</td>
+                    <td>
+                        <span id="totalPayment">-</span>
+                        <span class="info-text" id="totalPaymentInfo">總共需要支付的台幣金額</span>
+                    </td>
+                </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCurrency = 'RMB'; // 當前選擇的幣別
+
+        function switchCurrency(currency) {
+            currentCurrency = currency;
+            // 更新按鈕狀態
+            document.getElementById('toggleRMB').classList.toggle('active', currency === 'RMB');
+            document.getElementById('toggleTWD').classList.toggle('active', currency === 'TWD');
+            // 更新輸入框placeholder
+            const input = document.getElementById('totalInput');
+            if (currency === 'RMB') {
+                input.placeholder = '輸入總金額（每次200人民幣）';
+            } else {
+                input.placeholder = '輸入台幣總金額';
+            }
+            // 重新計算
+            calculate();
+        }
+
+        function calculate() {
+            // 人民幣金額固定為200
+            const rmb = 200;
+            // 獲取輸入值
+            const twd = parseFloat(document.getElementById('twd').value);
+            const fee = parseFloat(document.getElementById('fee').value) || 0;
+            const totalInput = parseFloat(document.getElementById('totalInput').value);
+
+            // 驗證基本輸入（台幣扣款是必需的）
+            if (!twd || twd <= 0) {
+                // 如果基本輸入不完整，隱藏結果
+                document.getElementById('results').classList.remove('show');
+                return;
+            }
+
+            // 計算總金額
+            const totalAmount = twd + fee;
+
+            // 計算不含手續費的匯率
+            const rateWithoutFee = twd / rmb;
+
+            // 計算含手續費的實際成本
+            const rateWithFee = totalAmount / rmb;
+
+            // 顯示結果
+            document.getElementById('rateWithoutFee').textContent = rateWithoutFee.toFixed(4) + ' TWD';
+            document.getElementById('rateWithoutFeeText').textContent = rateWithoutFee.toFixed(4);
+            
+            document.getElementById('rateWithFee').textContent = rateWithFee.toFixed(4) + ' TWD';
+            document.getElementById('rateWithFeeText').textContent = rateWithFee.toFixed(4);
+            
+            document.getElementById('totalPaymentAmount').textContent = totalAmount.toFixed(2) + ' TWD';
+
+            // 處理總金額輸入
+            if (totalInput && totalInput > 0) {
+                if (currentCurrency === 'RMB') {
+                    // 輸入的是人民幣，計算需要多少台幣
+                    // 刷卡次數（每次200人民幣的限制）
+                    const perCardRmb = 200;
+                    const cardCount = Math.ceil(totalInput / perCardRmb);
+                    // 總支付金額直接按總金額計算（不使用200的倍數）
+                    const totalPayment = totalInput * rateWithFee;
+
+                    // 顯示刷卡次數和總支付金額
+                    document.getElementById('cardCount').textContent = cardCount + ' 次';
+                    document.getElementById('cardCountText').textContent = cardCount;
+                    
+                    // RMB模式下顯示總支付金額
+                    document.getElementById('totalPaymentLabel').textContent = '總支付金額';
+                    document.getElementById('totalPayment').textContent = totalPayment.toFixed(2) + ' TWD';
+                    document.getElementById('totalPaymentInfo').textContent = '總共需要支付的台幣金額';
+
+                    // 顯示總金額計算結果
+                    document.getElementById('totalCalculationItem').style.display = 'table-row';
+                    document.getElementById('totalPaymentItem').style.display = 'table-row';
+                    document.getElementById('conversionItem').style.display = 'none';
+                } else {
+                    // 輸入的是台幣，計算可以換算成多少人民幣
+                    // 使用含手續費的實際成本來計算
+                    const convertedRmb = totalInput / rateWithFee;
+                    const perCardRmb = 200;
+                    const cardCount = Math.ceil(convertedRmb / perCardRmb);
+                    const actualPayment = cardCount * totalAmount;
+                    // 計算差額（實際支付金額 - 用戶輸入的台幣總金額）
+                    const difference = actualPayment - totalInput;
+
+                    // 顯示換算結果
+                    document.getElementById('conversionLabel').textContent = '實際人民幣總金額';
+                    document.getElementById('conversionAmount').textContent = convertedRmb.toFixed(2) + ' RMB';
+                    document.getElementById('conversionInfo').textContent = totalInput.toFixed(2) + ' 台幣可換算 ' + convertedRmb.toFixed(2) + ' 人民幣';
+
+                    // 顯示刷卡次數和差額
+                    document.getElementById('cardCount').textContent = cardCount + ' 次';
+                    document.getElementById('cardCountText').textContent = cardCount;
+                    
+                    // TWD模式下顯示差額
+                    document.getElementById('totalPaymentLabel').textContent = '本次支付實際差額';
+                    document.getElementById('totalPayment').textContent = difference.toFixed(2) + ' TWD';
+                    if (difference >= 0) {
+                        document.getElementById('totalPaymentInfo').textContent = '實際支付 ' + actualPayment.toFixed(2) + ' 台幣，需額外支付 ' + difference.toFixed(2) + ' 台幣';
+                    } else {
+                        document.getElementById('totalPaymentInfo').textContent = '實際支付 ' + actualPayment.toFixed(2) + ' 台幣，可退回 ' + Math.abs(difference).toFixed(2) + ' 台幣';
+                    }
+
+                    // 顯示所有結果
+                    document.getElementById('conversionItem').style.display = 'table-row';
+                    document.getElementById('totalCalculationItem').style.display = 'table-row';
+                    document.getElementById('totalPaymentItem').style.display = 'table-row';
+                }
+            } else {
+                // 隱藏所有總金額相關結果
+                document.getElementById('totalCalculationItem').style.display = 'none';
+                document.getElementById('totalPaymentItem').style.display = 'none';
+                document.getElementById('conversionItem').style.display = 'none';
+            }
+
+            // 顯示結果區域
+            document.getElementById('results').classList.add('show');
+        }
+
+        // 為所有輸入框添加即時計算功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = ['twd', 'fee', 'totalInput'];
+            inputs.forEach(function(inputId) {
+                const input = document.getElementById(inputId);
+                if (input) {
+                    input.addEventListener('input', calculate);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
