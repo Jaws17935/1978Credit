@@ -147,14 +147,6 @@
             font-size: 18px;
         }
 
-        .results-table .info-text {
-            color: #888;
-            font-size: 11px;
-            font-weight: normal;
-            display: block;
-            margin-top: 4px;
-        }
-
         .currency-toggle {
             display: flex;
             align-items: center;
@@ -232,48 +224,42 @@
             <div class="results-section">
                 <div class="results" id="results">
                     <table class="results-table">
-                <tr>
-                    <td>未含手續費匯率</td>
-                    <td>
-                        <span id="rateWithoutFee">-</span>
-                        <span class="info-text">1 人民幣 = <span id="rateWithoutFeeText">-</span> 台幣</span>
-                    </td>
-                </tr>
-                <tr class="highlight">
-                    <td>實含手續費匯率</td>
-                    <td>
-                        <span id="rateWithFee">-</span>
-                        <span class="info-text">1 人民幣 = <span id="rateWithFeeText">-</span> 台幣（實際成本）</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>實際含手續費總金額</td>
-                    <td>
-                        <span id="totalPaymentAmount">-</span>
-                        <span class="info-text">台幣扣款 + 手續費</span>
-                    </td>
-                </tr>
-                <tr class="highlight" id="conversionItem" style="display: none;">
-                    <td id="conversionLabel">實際人民幣總金額</td>
-                    <td>
-                        <span id="conversionAmount">-</span>
-                        <span class="info-text" id="conversionInfo">-</span>
-                    </td>
-                </tr>
-                <tr class="highlight" id="totalCalculationItem" style="display: none;">
-                    <td>實際需刷卡次數</td>
-                    <td>
-                        <span id="cardCount">-</span>
-                        <span class="info-text">每次200人民幣，共需 <span id="cardCountText">-</span> 次</span>
-                    </td>
-                </tr>
-                <tr class="highlight" id="totalPaymentItem" style="display: none;">
-                    <td id="totalPaymentLabel">總支付金額</td>
-                    <td>
-                        <span id="totalPayment">-</span>
-                        <span class="info-text" id="totalPaymentInfo">總共需要支付的台幣金額</span>
-                    </td>
-                </tr>
+                        <tr>
+                            <td>未含手續費匯率</td>
+                            <td>
+                                <span id="rateWithoutFee">-</span>
+                            </td>
+                        </tr>
+                        <tr class="highlight">
+                            <td>實含手續費匯率</td>
+                            <td>
+                                <span id="rateWithFee">-</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>實際含手續費總金額</td>
+                            <td>
+                                <span id="totalPaymentAmount">-</span>
+                            </td>
+                        </tr>
+                        <tr class="highlight" id="conversionItem" style="display: none;">
+                            <td id="conversionLabel">實際人民幣總金額</td>
+                            <td>
+                                <span id="conversionAmount">-</span>
+                            </td>
+                        </tr>
+                        <tr class="highlight" id="totalCalculationItem" style="display: none;">
+                            <td>實際需刷卡次數</td>
+                            <td>
+                                <span id="cardCount">-</span>
+                            </td>
+                        </tr>
+                        <tr class="highlight" id="totalPaymentItem" style="display: none;">
+                            <td id="totalPaymentLabel">總支付金額</td>
+                            <td>
+                                <span id="totalPayment">-</span>
+                            </td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -325,10 +311,8 @@
 
             // 顯示結果
             document.getElementById('rateWithoutFee').textContent = rateWithoutFee.toFixed(4) + ' TWD';
-            document.getElementById('rateWithoutFeeText').textContent = rateWithoutFee.toFixed(4);
             
             document.getElementById('rateWithFee').textContent = rateWithFee.toFixed(4) + ' TWD';
-            document.getElementById('rateWithFeeText').textContent = rateWithFee.toFixed(4);
             
             document.getElementById('totalPaymentAmount').textContent = totalAmount.toFixed(2) + ' TWD';
 
@@ -344,12 +328,10 @@
 
                     // 顯示刷卡次數和總支付金額
                     document.getElementById('cardCount').textContent = cardCount + ' 次';
-                    document.getElementById('cardCountText').textContent = cardCount;
                     
                     // RMB模式下顯示總支付金額
                     document.getElementById('totalPaymentLabel').textContent = '總支付金額';
                     document.getElementById('totalPayment').textContent = totalPayment.toFixed(2) + ' TWD';
-                    document.getElementById('totalPaymentInfo').textContent = '總共需要支付的台幣金額';
 
                     // 顯示總金額計算結果
                     document.getElementById('totalCalculationItem').style.display = 'table-row';
@@ -368,20 +350,13 @@
                     // 顯示換算結果
                     document.getElementById('conversionLabel').textContent = '實際人民幣總金額';
                     document.getElementById('conversionAmount').textContent = convertedRmb.toFixed(2) + ' RMB';
-                    document.getElementById('conversionInfo').textContent = totalInput.toFixed(2) + ' 台幣可換算 ' + convertedRmb.toFixed(2) + ' 人民幣';
 
                     // 顯示刷卡次數和差額
                     document.getElementById('cardCount').textContent = cardCount + ' 次';
-                    document.getElementById('cardCountText').textContent = cardCount;
                     
                     // TWD模式下顯示差額
                     document.getElementById('totalPaymentLabel').textContent = '本次支付實際差額';
                     document.getElementById('totalPayment').textContent = difference.toFixed(2) + ' TWD';
-                    if (difference >= 0) {
-                        document.getElementById('totalPaymentInfo').textContent = '實際支付 ' + actualPayment.toFixed(2) + ' 台幣，需額外支付 ' + difference.toFixed(2) + ' 台幣';
-                    } else {
-                        document.getElementById('totalPaymentInfo').textContent = '實際支付 ' + actualPayment.toFixed(2) + ' 台幣，可退回 ' + Math.abs(difference).toFixed(2) + ' 台幣';
-                    }
 
                     // 顯示所有結果
                     document.getElementById('conversionItem').style.display = 'table-row';
